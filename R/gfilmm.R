@@ -99,6 +99,7 @@ gfilmm <- function(
   attr(gfi, "covariates") <- getCovariates(data, fixed)
   attr(gfi, "fixed") <- fixed
   attr(gfi, "random") <- random
+  attr(gfi, "precision") <- precision
   class(gfi) <- "gfilmm"
   gfi
 }
@@ -109,9 +110,10 @@ gfilmm <- function(
 #' @export
 print.gfilmm <- function(x, ...){
   nms <- names(x)
+  precision <- attr(x, "precision")
   attributes(x) <- NULL
   cat(
-    "`gfilmm` object", "\n",
+    sprintf("`gfilmm` object (%s precision)", precision), "\n",
     "---------------", "\n",
     sep = ""
   )
