@@ -396,13 +396,13 @@ const Eigen::MatrixXd umatrix(const size_t nrows,
 }
 
 template <typename Real>
-Eigen::MatrixXd pickCoordinates(
+Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic> pickCoordinates(
     const size_t Dim,
     const size_t N,
     const size_t fe,
     const std::vector<Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic>>& VT,
     const Eigen::MatrixXd& U) {
-  Eigen::MatrixXd VTend(Dim, N);
+  Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic> VTend(Dim, N);
   for(size_t i = 0; i < N; i++) {
     const Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic> VTi = VT[i];
     for(size_t j = 0; j < Dim; j++) {
@@ -414,17 +414,17 @@ Eigen::MatrixXd pickCoordinates(
           if(x < 0) {
             x = 0;
           }
-          VTend(j, i) = (double)x;
+          VTend(j, i) = x;
         }
       } else {
         if(j < fe) {
-          VTend(j, i) = (double)VTi.row(j).maxCoeff();
+          VTend(j, i) = VTi.row(j).maxCoeff();
         } else {
           Real x = VTi.row(j).maxCoeff();
           if(x < 0) {
             x = 0;
           }
-          VTend(j, i) = (double)x;
+          VTend(j, i) = x;
         }
       }
     }
@@ -456,7 +456,7 @@ GFI<Real> gfilmm_(const Eigen::Matrix<Real, Eigen::Dynamic, 1>& L,
   const size_t re = RE2.cols();
   const size_t Dim = fe + re;
   const size_t Dimm1 = Dim - 1;
-  Eigen::MatrixXd VERTEX(Dim, N);  // output
+  Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic> VERTEX(Dim, N);  // output
   const Rcpp::IntegerVector Esum = Rcpp::cumsum(E);
 
   //-------- SET-UP ALGORITHM OBJECTS ------------------------------------------
@@ -807,7 +807,7 @@ GFI<Real> gfilmm_(const Eigen::Matrix<Real, Eigen::Dynamic, 1>& L,
         throw Rcpp::exception("Something bad occured.");
       }
       WTnorm = WT / WTsum;
-      ESS(k) = (double)(1 / (WTnorm.dot(WTnorm)));
+      ESS(k) = 1 / (WTnorm.dot(WTnorm));
 
       JJ.conservativeResize(JJ.size() + 1);
       const int lenJJ = JJ.size();
@@ -1214,7 +1214,7 @@ Eigen::MatrixXd l2d(
 }
 
 Eigen::VectorXd l2dVector(Eigen::Matrix<long double, Eigen::Dynamic, 1> V) {
-  Eigen::MatrixXd out(V.rows());
+  Eigen::VectorXd out(V.rows());
   for(auto i = 0; i < V.size(); i++) {
     out(i) = (double)V.coeff(i);
   }
@@ -1255,7 +1255,7 @@ Eigen::MatrixXd mp2d(
 }
 
 Eigen::VectorXd mp2dVector(Eigen::Matrix<mp::float128, Eigen::Dynamic, 1> V) {
-  Eigen::MatrixXd out(V.rows());
+  Eigen::VectorXd out(V.rows());
   for(auto i = 0; i < V.size(); i++) {
     out(i) = V.coeff(i).convert_to<double>();
   }
