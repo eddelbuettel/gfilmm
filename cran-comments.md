@@ -1,7 +1,13 @@
 ## Release summary
 
-This is a resubmission. Some tests with the previous submission failed. I have 
-fixed these tests.
+* I have fixed the issue spotted by the CRAN check on Solaris. It was due to 
+the C++ `pow` function which doesn't accept integer arguments.
+
+* This is a major release, with bugs fixed, new features, and updated vignette.
+
+* On r-hub, the compilation fails on Fedora, which uses the `clang` compiler. 
+But the version of `clang` used on CRAN is more recent, so I hope the 
+compilation will work.
 
 ## Test environments
 
@@ -11,6 +17,4 @@ fixed these tests.
 
 ## R CMD check results
 
-0 errors | 0 warnings | 1 note
-
-* This is a new release.
+OK

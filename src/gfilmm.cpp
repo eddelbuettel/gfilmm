@@ -1,5 +1,4 @@
-// -*- mode: C++; c-indent-level: 2; c-basic-offset: 2; indent-tabs-mode: nil;
-// -*-
+// -*- mode: C++; c-indent-level: 2; c-basic-offset: 2; indent-tabs-mode: nil; -*-
 
 // we only include RcppEigen.h which pulls Rcpp.h in for us
 #include <RcppEigen.h>
