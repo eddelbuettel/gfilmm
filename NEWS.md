@@ -1,4 +1,4 @@
-# gfilmm 0.1.0.9900
+# gfilmm 1.0.0
 
 * Fixed two mistakes in the C++ code.
 * Fixed a mistake in the R code; the results were wrong when the model had 
