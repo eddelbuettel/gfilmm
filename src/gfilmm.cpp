@@ -461,6 +461,11 @@ GFI<Real> gfilmm_(
     const unsigned seed,
     const unsigned nthreads) {
   std::default_random_engine generator(seed);
+  std::vector<std::default_random_engine> generators(nthreads);
+  for(size_t t = 0; t < nthreads; t++) {
+    std::default_random_engine gen(seed + (t + 1) * 2000000);
+    generators[t] = gen;
+  }
   Eigen::Matrix<Real, Eigen::Dynamic, 1> WTnorm(N);  // output:weights
   const size_t n = L.size();
   const size_t fe = FE.cols();  // si FE=NULL, passer une matrice n x 0
@@ -629,8 +634,8 @@ GFI<Real> gfilmm_(
         Z1 << FE.row(k).transpose(), Z1t;
         Eigen::Matrix<Real, Eigen::Dynamic, 1> VTsum = VT1.transpose() * Z1;
 
-        const std::vector<Real> sample =
-            fidSample<Real>(VT2, VTsum, L.coeff(k), U.coeff(k), generators[thread]);
+        const std::vector<Real> sample = fidSample<Real>(
+            VT2, VTsum, L.coeff(k), U.coeff(k), generators[thread]);
 
         const Real ZZ = sample[0];
         const Real wt = sample[1];
@@ -920,7 +925,8 @@ GFI<Real> gfilmm_(
               }
             }
             if(copy) {
-              const std::vector<size_t> ord = sample_int(re, generators[thread]);
+              const std::vector<size_t> ord =
+                  sample_int(re, generators[thread]);
               for(size_t j = 0; j < re; j++) {
                 const size_t kk = ord[j];
                 for(size_t ii = 0; ii < copy; ii++) {
@@ -1045,7 +1051,8 @@ GFI<Real> gfilmm_(
                   } else {
                     const Real b = sqrt(Z1.dot(Z1));
                     const Eigen::Matrix<Real, Eigen::Dynamic, 1> tau = Z1 / b;
-                    const Real bb = sqrt(rchisq<Real>(lenZ1, generators[thread]));
+                    const Real bb =
+                        sqrt(rchisq<Real>(lenZ1, generators[thread]));
                     for(size_t jj = 0; jj < lenZ1; jj++) {
                       Ztemp[kk](Z00[jj], ii) = bb * tau.coeff(jj);
                     }
@@ -1192,7 +1199,8 @@ GFI<Real> gfilmm_(
           const Eigen::Matrix<Real, Eigen::Dynamic, 1> tau_ = Z1 - O2a;
           const Real b = sqrt(tau_.dot(tau_));
           const Eigen::Matrix<Real, Eigen::Dynamic, 1> tau = tau_ / b;
-          const Real bb = sqrt(rchisq<Real>(lenZ1 - rankO2, generators[thread]));
+          const Real bb =
+              sqrt(rchisq<Real>(lenZ1 - rankO2, generators[thread]));
           const Real bbb = b / bb;
           Eigen::Matrix<Real, Eigen::Dynamic, 1> aa(rankO2);
           for(int jj = 0; jj < rankO2; jj++) {
