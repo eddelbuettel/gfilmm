@@ -888,14 +888,20 @@ GFI<Real> gfilmm_(
           }
         }
         std::vector<Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic>> ZZ(re);
+        std::vector<size_t> Nsons_sum(N);
+        Nsons_sum[0] = 0;
+        for(size_t i = 1; i < N; i++) {
+          Nsons_sum[i] = Nsons_sum[i - 1] + N_sons[i - 1];
+        }
         for(size_t ii = 0; ii < re; ii++) {
-          ZZ[ii].resize(E(ii), 0);
+          ZZ[ii].resize(E(ii), Nsons_sum[N - 1] + N_sons[N - 1]);
         }
         std::vector<size_t> VCVC(N, 0);
         std::vector<Eigen::MatrixXi> CCCC(N);
         std::vector<Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic,
                                   Eigen::RowMajor>>
             VTVT(N);
+
 #ifdef _OPENMP
 #pragma omp parallel for num_threads(nthreads)
 #endif
@@ -1061,9 +1067,7 @@ GFI<Real> gfilmm_(
               }
             }
             for(size_t ii = 0; ii < re; ii++) {
-              ZZ[ii].conservativeResize(Eigen::NoChange,
-                                        ZZ[ii].cols() + (int)Nsons_i);
-              ZZ[ii].rightCols(Nsons_i) = Ztemp[ii];
+              ZZ[ii].block(0, Nsons_sum[i], E(ii), Nsons_i) = Ztemp[ii];
             }
             size_t d = 0;
             for(size_t ii = 0; ii < i; ii++) {
@@ -1128,7 +1132,7 @@ GFI<Real> gfilmm_(
       }
       nn[ii] = cppunique(vec);
       lengths_nn[ii] = nn[ii].size();
-      ZZ[ii].resize(lengths_nn[ii], 0);
+      ZZ[ii].resize(lengths_nn[ii], N);
     }
 
 #ifdef _OPENMP
@@ -1229,8 +1233,7 @@ GFI<Real> gfilmm_(
         }
       }
       for(size_t ii = 0; ii < re; ii++) {
-        ZZ[ii].conservativeResize(Eigen::NoChange, ZZ[ii].cols() + 1);
-        ZZ[ii].rightCols(1) = Ztemp[ii];
+        ZZ[ii].col(i) = Ztemp[ii];
       }
       VTVT[i] = VTtemp;
     }
